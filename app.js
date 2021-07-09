@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 
 const weather = require('weather-js')
 
+
 const token = '1874753971:AAEJKwRQAqBfj0Ndj5MRw1_gLU3fkZJJvHw';
 
 // 1813510459:AAHsjoBO0mi2pcUMkmQBA-ab-UEUPZzn7P4           СТАРЫЙ ТОКЕН
@@ -187,8 +188,35 @@ app.post('/sendMessage', function (request, response) {
     response.end()
 })
 
+bot.onText(/\/start/, (msg) => {
+    let files = fs.readdirSync('./media/audio');
+
+    let fullMessage = msg.text;
+    let messageArray = fullMessage.split(' ');
+    messageArray.splice(0, 1);
+    messageWithoutCommand = messageArray.join(' ');
+
+    let ArtistSongs = [];
+
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].includes(messageWithoutCommand)) {
+            ArtistSongs.push(files[i])
+        }
+    }
+
+    bot.sendMessage(msg.chat.id, "Чекни клавиатуру", {
+        "reply_markup": {
+            "keyboard": [ArtistSongs]
+        }
+    });
+
+});
+
 bot.on('message', function (msg) {
-    // saveUser(msg.chat.first_name, msg.chat.id)
+    let messageText = msg.text;
+
+    bot.sendAudio(msg.chat.id, './media/audio/' + messageText)
+
 })
 
 app.listen(8080)
